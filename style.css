@@ -1,0 +1,30 @@
+html {
+  cursor: none;
+}
+
+#cursor {
+  position: absolute;
+  width: 15px;
+  height: 22px;
+}
+
+#game {
+  position: absolute;
+  bottom: 50%;
+  right: 50%;
+}
+
+button {
+  padding: 2.4vh;
+  margin: 1vh;
+  font-size: 2vh;
+  border-radius: 13px;
+  border: 2px solid grey;
+  background-color: #222;
+  color: white;
+}
+
+/* StupidGame */
+#running_btn{
+position:absolute;
+}
