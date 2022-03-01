@@ -67,7 +67,9 @@ var GameModes;
                 this.updateMouse();
             };
         }
-        get state() { return this._state; }
+        get state() {
+            return this._state;
+        }
         updateMousePos(event) {
             this._state.cursorPos.x = event.pageX;
             this._state.cursorPos.y = event.pageY;
@@ -88,7 +90,7 @@ var GameModes;
             super([
                 new GameElements.Headlines.SimpleHeadline("Are you dumb?"),
                 new GameElements.Buttons.ImStupidButton(),
-                new GameElements.Buttons.RunningButton()
+                new GameElements.Buttons.RunningButton(),
             ]);
             this._state = new GameState(this.elements, simpleDiv, "normal.png", true);
         }
@@ -104,7 +106,7 @@ var GameModes;
                 new GameElements.Buttons.PrisonButton(),
                 new GameElements.Areas.Prison(),
             ]);
-            this._state.customStates['clicks'] = 0;
+            this._state.customStates["clicks"] = 0;
             window.onclick = () => this.onClick();
         }
         updateMousePos(event) {
@@ -119,8 +121,8 @@ var GameModes;
             }
         }
         onClick() {
-            this._state.customStates['clicks']++;
-            let clickCount = this._state.customStates['clicks'];
+            this._state.customStates["clicks"]++;
+            let clickCount = this._state.customStates["clicks"];
             // Headline is first elemets of this.elemets array
             if (clickCount >= 100) {
                 window.onclick = null;
@@ -251,8 +253,12 @@ var GameElements;
                 this.pos = new Vector(0, 0);
             }
             render() {
-                return new GameElements.ElementCreator("button").setId("running_btn").onHover(() => this.onHover())
-                    .setText("No").setPositionV(this.pos.x + "vh", this.pos.y + "vh").toElement();
+                return new GameElements.ElementCreator("button")
+                    .setId("running_btn")
+                    .onHover(() => this.onHover())
+                    .setText("No")
+                    .setPositionV(this.pos.x + "vh", this.pos.y + "vh")
+                    .toElement();
             }
             onHover() {
                 this.pos.x = getRandomArbitrary(-40, 40);
@@ -266,7 +272,10 @@ var GameElements;
                 this.text = "Yes";
             }
             render() {
-                return new GameElements.ElementCreator("button").setText(this.text).onClick(() => this.onClick()).toElement();
+                return new GameElements.ElementCreator("button")
+                    .setText(this.text)
+                    .onClick(() => this.onClick())
+                    .toElement();
             }
             onClick() {
                 gameManager.changeGameMode("Happy we both can agree on that :)");
@@ -278,7 +287,10 @@ var GameElements;
                 this.text = "Get me out of this prison";
             }
             render() {
-                return new GameElements.ElementCreator("button").setText(this.text).onClick(() => this.onClick()).toElement();
+                return new GameElements.ElementCreator("button")
+                    .setText(this.text)
+                    .onClick(() => this.onClick())
+                    .toElement();
             }
             onClick() {
                 gameManager.changeGameMode("Congrats. For a second there I thought you wouldn't make it :)");
@@ -295,7 +307,10 @@ var GameElements;
         class SimpleHeadline {
             constructor(text) {
                 this.text = text;
-                this.render = () => new GameElements.ElementCreator("h1").setId("headline").setText(this.text).toElement();
+                this.render = () => new GameElements.ElementCreator("h1")
+                    .setId("headline")
+                    .setText(this.text)
+                    .toElement();
             }
         }
         Headlines.SimpleHeadline = SimpleHeadline;
