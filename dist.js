@@ -13,12 +13,13 @@ window.onload = function () {
 class GameManager {
     constructor() {
         // Default is set to PrisonGame for purpose of showcasing the new mode
-        this.game = new GameModes.PrisonGame();
+        this.game = new GameModes.SlowGame();
     }
     renderGame() {
         var _a;
         (_a = document.getElementById("game")) === null || _a === void 0 ? void 0 : _a.remove();
-        document.body.appendChild(this.game.state.render());
+        document.body.prepend(this.game.state.render());
+        window.onclick = (event) => this.onClick(event);
     }
     newGame() {
         var i;
@@ -39,7 +40,19 @@ class GameManager {
         if (!this.game.state.canWin)
             return;
         let modeName = this.newGame();
-        alert(`${gameMessage}\nLet's play another round(${modeName}).`);
+        alert(`${gameMessage}\nLet's play another round which is going to be ${modeName}.`);
+    }
+    mouseOut() {
+        var alert = document.getElementById("mouse-alert");
+        if (alert.className === "mouseout-alert")
+            alert.className = "mousein-alert";
+    }
+    mouseIn() {
+        document.getElementById("mouse-alert").className = "mouseout-alert";
+    }
+    onClick(event) {
+        let pos = this.game.state.cursorPos;
+        document.elementFromPoint(pos.x, pos.y).click();
     }
 }
 var GameModes;
@@ -123,7 +136,6 @@ var GameModes;
         onClick() {
             this._state.customStates["clicks"]++;
             let clickCount = this._state.customStates["clicks"];
-            // Headline is first elemets of this.elemets array
             if (clickCount >= 100) {
                 window.onclick = null;
                 document.getElementById("prison").remove();
@@ -139,6 +151,26 @@ var GameModes;
         listGameMode("PrisonGame", 3)
     ], PrisonGame);
     GameModes.PrisonGame = PrisonGame;
+    let SlowGame = class SlowGame extends GameMode {
+        constructor() {
+            super([
+                new GameElements.Headlines.SimpleHeadline("Patience is a virtue"),
+                new GameElements.Buttons.SlowGameButton(),
+            ]);
+            this.speedRatio = 0.09;
+            this._state = new GameState(this.elements, simpleDiv, "normal.png", true);
+            window.onmouseover = () => gameManager.mouseOut();
+            window.onmouseout = () => gameManager.mouseIn();
+        }
+        updateMousePos(event) {
+            this._state.cursorPos.x += event.movementX * this.speedRatio;
+            this._state.cursorPos.y += event.movementY * this.speedRatio;
+        }
+    };
+    SlowGame = __decorate([
+        listGameMode("SlowGame", 3)
+    ], SlowGame);
+    GameModes.SlowGame = SlowGame;
 })(GameModes || (GameModes = {}));
 function simpleDiv(state) {
     return document.createElement("div");
@@ -297,6 +329,21 @@ var GameElements;
             }
         }
         Buttons.PrisonButton = PrisonButton;
+        class SlowGameButton {
+            constructor() {
+                this.text = "No";
+            }
+            render() {
+                return new GameElements.ElementCreator("button")
+                    .setText(this.text)
+                    .onClick(() => this.onClick())
+                    .toElement();
+            }
+            onClick() {
+                gameManager.changeGameMode("Yes, it is. Anyway, happy to see you here.");
+            }
+        }
+        Buttons.SlowGameButton = SlowGameButton;
     })(Buttons = GameElements.Buttons || (GameElements.Buttons = {}));
 })(GameElements || (GameElements = {}));
 /// <reference path="base.ts" />

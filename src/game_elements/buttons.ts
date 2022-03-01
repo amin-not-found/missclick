@@ -48,5 +48,19 @@ namespace GameElements {
         );
       }
     }
+    export class SlowGameButton implements IButton {
+      readonly text: string = "No";
+      render(): HTMLElement {
+        return new ElementCreator("button")
+          .setText(this.text)
+          .onClick(() => this.onClick())
+          .toElement();
+      }
+      onClick(): void {
+        gameManager.changeGameMode(
+          "Yes, it is. Anyway, happy to see you here."
+        );
+      }
+    }
   }
 }

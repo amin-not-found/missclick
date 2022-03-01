@@ -1,10 +1,11 @@
 class GameManager {
   // Default is set to PrisonGame for purpose of showcasing the new mode
-  private game: GameModes.IGameMode = new GameModes.PrisonGame();
+  private game: GameModes.IGameMode = new GameModes.SlowGame();
 
   renderGame() {
     document.getElementById("game")?.remove();
-    document.body.appendChild(this.game.state.render());
+    document.body.prepend(this.game.state.render());
+    window.onclick = (event) => this.onClick(event);
   }
 
   private newGame(): string {
@@ -27,6 +28,20 @@ class GameManager {
   changeGameMode(gameMessage: string) {
     if (!this.game.state.canWin) return;
     let modeName = this.newGame();
-    alert(`${gameMessage}\nLet's play another round(${modeName}).`);
+    alert(
+      `${gameMessage}\nLet's play another round which is going to be ${modeName}.`
+    );
+  }
+
+  mouseOut() {
+    var alert = document.getElementById("mouse-alert")!;
+    if (alert.className === "mouseout-alert") alert.className = "mousein-alert";
+  }
+  mouseIn() {
+    document.getElementById("mouse-alert")!.className = "mouseout-alert";
+  }
+  onClick(event: MouseEvent) {
+    let pos = this.game.state.cursorPos;
+    (document.elementFromPoint(pos.x, pos.y) as HTMLElement).click();
   }
 }

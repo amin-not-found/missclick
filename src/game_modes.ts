@@ -102,7 +102,6 @@ namespace GameModes {
       this._state.customStates["clicks"]++;
       let clickCount = this._state.customStates["clicks"];
 
-      // Headline is first elemets of this.elemets array
       if (clickCount >= 100) {
         window.onclick = null;
         document.getElementById("prison")!.remove();
@@ -114,6 +113,24 @@ namespace GameModes {
           "headline"
         )!.innerHTML = `Ok. I get it after ${clickCount} clicks.<br> Here's the deal:<br> Just click 100 times ;)`;
       }
+    }
+  }
+
+  @listGameMode("SlowGame", 3)
+  export class SlowGame extends GameMode implements IGameMode {
+    private speedRatio: number = 0.09;
+    constructor() {
+      super([
+        new GameElements.Headlines.SimpleHeadline("Patience is a virtue"),
+        new GameElements.Buttons.SlowGameButton(),
+      ]);
+      this._state = new GameState(this.elements, simpleDiv, "normal.png", true);
+      window.onmouseover = () => gameManager.mouseOut();
+      window.onmouseout = () => gameManager.mouseIn();
+    }
+    updateMousePos(event: MouseEvent): void {
+      this._state.cursorPos.x += event.movementX * this.speedRatio;
+      this._state.cursorPos.y += event.movementY * this.speedRatio;
     }
   }
 }

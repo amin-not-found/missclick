@@ -12,6 +12,7 @@ body {
   margin: 0;
   color: var(--color1);
   background-color: var(--color3);
+  overflow: hidden;
 }
 * {
   cursor: none;
@@ -38,6 +39,51 @@ button {
   border: 2px solid var(--color2);
   background-color: var(--color1);
   color: var(--color3);
+}
+
+#mouse-alert {
+  position: absolute;
+  width: 50%;
+  left: 25%;
+  margin: 0vh;
+  padding: 0.7vh;
+  background-color: var(--color4);
+  color: var(--color3);
+  font-size: larger;
+  text-align: center;
+  border: 3px solid var(--color5);
+  border-width: 4px 4px 0 4px;
+  border-radius: 3vh 3vh 0 0;
+}
+
+.mouse-alert-hidden {
+  bottom: -10vh;
+}
+.mousein-alert {
+  bottom: -10vh;
+  animation: go-out 1s 1;
+}
+.mouseout-alert {
+  bottom: 0;
+  animation: come-in 1s 1;
+}
+
+@keyframes come-in {
+  0% {
+    bottom: -10vh;
+  }
+  100% {
+    bottom: 0;
+  }
+}
+
+@keyframes go-out {
+  0% {
+    bottom: 0;
+  }
+  90% {
+    bottom: -10vh;
+  }
 }
 
 #running_btn {
