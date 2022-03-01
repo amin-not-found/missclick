@@ -1,6 +1,17 @@
+:root {
+  --color1: #2b2d42;
+  --color2: #8d99ae;
+  --color3: #edf2f4;
+  --color4: #ef233c;
+  --color5: #d90429;
+}
+
 html,
 body {
   height: 100%;
+  margin: 0;
+  color: var(--color1);
+  background-color: var(--color3);
 }
 * {
   cursor: none;
@@ -24,9 +35,9 @@ button {
   margin: 1vh;
   font-size: 2vh;
   border-radius: 13px;
-  border: 2px solid grey;
-  background-color: #222;
-  color: white;
+  border: 2px solid var(--color2);
+  background-color: var(--color1);
+  color: var(--color3);
 }
 
 #running_btn {
@@ -38,6 +49,6 @@ button {
   top: 42vh;
   width: 24vh;
   height: 24vh;
-  border: 2px dashed red;
+  border: 2px dashed var(--color5);
   border-radius: 100%;
 }
