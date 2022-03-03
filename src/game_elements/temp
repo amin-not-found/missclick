@@ -1,0 +1,26 @@
+  private createNewGame(): GameModes.GameModeRepresentor {
+    let newGame = null;
+    if (!this.game) {
+      newGame = GameModes.availableModes.find(
+        (gameMode) => gameMode.name === "StupidGame"
+      )!;
+    } else if (!this.game.canWin()) {
+      // TODO : change to CheatGame
+      newGame = GameModes.availableModes.find(
+        (gameMode) => gameMode.name === "SlowGame"
+      )!;
+    } else {
+      // Chose random game mode based of weights
+      var i;
+      let options = GameModes.availableModes;
+      var weights: number[] = [];
+      for (i = 0; i < options.length; i++)
+        weights[i] = options[i].probability + (weights[i - 1] || 0);
+
+      var random = Math.random() * weights[weights.length - 1];
+
+      for (i = 0; i < weights.length; i++) if (weights[i] > random) break;
+
+      newGame = options[i];
+    }
+    return newGame;

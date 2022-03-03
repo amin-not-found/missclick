@@ -1,10 +1,12 @@
-function getRandomArbitrary(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min)) + min;
+function randomNumber(min: number, max: number) {
+  return Math.random() * (max - min) + min;
 }
 
-function weightedChoice(weights: number[]) {
-  var random = Math.random() * weights[weights.length - 1];
-  let i = 0;
-  for (; i < weights.length; i++) if (weights[i] > random) break;
-  return i;
+function randomCornerLocation(): Vector {
+  let x = Math.random() * 50 + 50;
+  x = Math.random() > 0.5 ? x : window.innerWidth - x;
+  let y = Math.random() * 50 + 50;
+  y = Math.random() > 0.5 ? y : window.innerHeight - y;
+
+  return new Vector(x, y);
 }

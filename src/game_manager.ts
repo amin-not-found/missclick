@@ -1,17 +1,42 @@
 class GameManager {
   // Default is set to PrisonGame for purpose of showcasing the new mode
-  private game: GameModes.IGameMode = new GameModes.SlowGame();
+  //private game: GameModes.IGameMode = new GameModes.StupidGame();
+  private game: GameModes.IGameMode | null = null;
+  private gameName?: string;
+
+  constructor() {
+    this.setupGame(this.createNewGame());
+    document.onpointerlockchange = () => this.handlePointerLockChange();
+  }
+
+  setupGame(gameMode: GameModes.GameModeRepresentor) {
+    this.gameName = gameMode.name;
+    this.game = new gameMode.classConstructor();
+    this.game.setupEvents();
+    this.renderGame();
+  }
 
   renderGame() {
     document.getElementById("game")?.remove();
-    document.body.prepend(this.game.state.render());
+    document.body.prepend(this.game!.state.render());
+    document.body.requestPointerLock();
     window.onclick = (event) => this.onClick(event);
   }
 
-  private newGame(): string {
+  private createNewGame(): GameModes.GameModeRepresentor {
+    if (!this.game) {
+      return GameModes.availableModes.find(
+        (gameMode) => gameMode.name === "StupidGame"
+      )!;
+    } else if (!this.game.canWin()) {
+      // TODO : change to CheatGame
+      return GameModes.availableModes.find(
+        (gameMode) => gameMode.name === "SlowGame"
+      )!;
+    }
     var i;
-    var weights: number[] = [];
     let options = GameModes.availableModes;
+    var weights: number[] = [];
     for (i = 0; i < options.length; i++)
       weights[i] = options[i].probability + (weights[i - 1] || 0);
 
@@ -19,29 +44,52 @@ class GameManager {
 
     for (i = 0; i < weights.length; i++) if (weights[i] > random) break;
 
-    let gameMode = options[i];
-    this.game = new gameMode.classConstructor();
-    this.renderGame();
-    return gameMode.name;
+    return options[i];
   }
 
   changeGameMode(gameMessage: string) {
-    if (!this.game.state.canWin) return;
-    let modeName = this.newGame();
-    alert(
-      `${gameMessage}\nLet's play another round which is going to be ${modeName}.`
+    let gameCountStr = localStorage.getItem(this.gameName!) ?? "0";
+    let gameCount = parseInt(gameCountStr);
+    gameCount = gameCount == NaN ? 0 : gameCount;
+    localStorage.setItem(this.gameName!, (gameCount + 1).toString());
+
+    let newGame = this.createNewGame();
+    if (newGame == null) return;
+    document.getElementById("game")?.remove();
+
+    var winDialog = new GameElements.ElementCreator("div")
+      .setId("win-dialog")
+      .toElement();
+    winDialog.appendChild(
+      new GameElements.ElementCreator("h1").setText(gameMessage).toElement()
     );
+    winDialog.appendChild(
+      new GameElements.ElementCreator("button")
+        .setText(
+          `Let's play another round which is going to be ${newGame.name}.`
+        )
+        .onClick(() => {
+          this.setupGame(newGame);
+          winDialog.remove();
+        })
+        .toElement()
+    );
+    document.body.prepend(winDialog);
   }
 
-  mouseOut() {
-    var alert = document.getElementById("mouse-alert")!;
-    if (alert.className === "mouseout-alert") alert.className = "mousein-alert";
+  handlePointerLockChange() {
+    if (document.pointerLockElement) {
+      document.getElementById("mouse-alert")!.className = "mousein-alert";
+      this.game!.setupEvents();
+    } else {
+      window.onmousemove = null;
+      document.getElementById("mouse-alert")!.className = "mouseout-alert";
+    }
   }
-  mouseIn() {
-    document.getElementById("mouse-alert")!.className = "mouseout-alert";
-  }
+
   onClick(event: MouseEvent) {
-    let pos = this.game.state.cursorPos;
-    (document.elementFromPoint(pos.x, pos.y) as HTMLElement).click();
+    if (!document.pointerLockElement) document.body.requestPointerLock();
+    let pos = this.game!.state.cursorPos;
+    (document.elementFromPoint(pos.x, pos.y) as HTMLElement)?.click();
   }
 }

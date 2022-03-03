@@ -8,7 +8,6 @@ class GameState {
     readonly elements: GameElements.IGameElement[],
     readonly buildRootElement: (state: GameState) => Element = simpleDiv,
     readonly cursor: String = "normal.png",
-    public canWin = false,
     public customStates: Record<string, any> = {}
   ) {
     this.cursorPos = new Vector(0, 0);

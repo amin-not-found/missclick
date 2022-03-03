@@ -1,8 +1,8 @@
 namespace GameModes {
   export interface IGameMode {
     readonly state: GameState;
-    updateMouse(): void;
-    updateMousePos(event: MouseEvent): void;
+    setupEvents(): void;
+    canWin(): boolean;
   }
 
   export let availableModes: GameModeRepresentor[] = [];
@@ -10,7 +10,7 @@ namespace GameModes {
     new (...args: any[]): T;
     readonly prototype: T;
   };
-  class GameModeRepresentor {
+  export class GameModeRepresentor {
     constructor(
       public name: string,
       public probability: number,
@@ -24,26 +24,33 @@ namespace GameModes {
     };
   }
 
-  class GameMode {
+  class GameMode implements IGameMode {
     protected _state: GameState;
     elements: GameElements.IGameElement[];
 
     constructor(gameElements: GameElements.IGameElement[]) {
       this.elements = gameElements;
       this._state = new GameState(gameElements);
-      window.onmousemove = (event) => {
-        this.updateMousePos(event);
-        this.updateMouse();
-      };
     }
 
     get state(): GameState {
       return this._state;
     }
 
-    updateMousePos(event: MouseEvent) {
-      this._state.cursorPos.x = event.pageX;
-      this._state.cursorPos.y = event.pageY;
+    updateMousePos(event: MouseEvent, xRatio = 1, yRatio = 1) {
+      this._state.cursorPos.x += event.movementX * xRatio;
+      this._state.cursorPos.y += event.movementY * yRatio;
+
+      if (this.state.cursorPos.x >= window.innerWidth) {
+        this._state.cursorPos.x -= window.innerWidth;
+      } else if (this.state.cursorPos.x < 0) {
+        this._state.cursorPos.x += window.innerWidth;
+      }
+      if (this.state.cursorPos.y >= window.innerHeight) {
+        this._state.cursorPos.y -= window.innerHeight;
+      } else if (this.state.cursorPos.y < 0) {
+        this._state.cursorPos.y += window.innerHeight;
+      }
     }
 
     updateMouse() {
@@ -55,6 +62,25 @@ namespace GameModes {
       cursor.style.top = this._state.cursorPos.y + "px";
       document.body.appendChild(cursor);
     }
+
+    setupEvents() {
+      window.onclick = (event: MouseEvent) => gameManager.onClick(event);
+      window.onmousemove = (event: MouseEvent) => {
+        this.updateMousePos(event);
+        this.updateMouse();
+      };
+    }
+    // Default behaviour for games that have a game with EndGame button
+    canWin() {
+      let elementUnderCursor = document.elementFromPoint(
+        this._state.cursorPos.x,
+        this._state.cursorPos.y
+      );
+      if (elementUnderCursor?.id === "end-game-button") {
+        return true;
+      }
+      return false;
+    }
   }
 
   @listGameMode("StupidGame", 3)
@@ -62,10 +88,25 @@ namespace GameModes {
     constructor() {
       super([
         new GameElements.Headlines.SimpleHeadline("Are you dumb?"),
-        new GameElements.Buttons.ImStupidButton(),
+        new GameElements.Buttons.EndGameButton(
+          "Yes",
+          "Happy we both can agree on that :)"
+        ),
         new GameElements.Buttons.RunningButton(),
       ]);
-      this._state = new GameState(this.elements, simpleDiv, "normal.png", true);
+      this._state = new GameState(this.elements, simpleDiv, "normal.png");
+    }
+    updateMouse(): void {
+      super.updateMouse();
+      let elementUnderCursor = document.elementFromPoint(
+        this._state.cursorPos.x,
+        this._state.cursorPos.y
+      ) as HTMLElement;
+      if (document.getElementById("running_btn") === elementUnderCursor) {
+        elementUnderCursor.style.top = Math.round(randomNumber(-40, 40)) + "vh";
+        elementUnderCursor.style.left =
+          Math.round(randomNumber(-40, 40)) + "vw";
+      }
     }
   }
 
@@ -76,11 +117,13 @@ namespace GameModes {
         new GameElements.Headlines.SimpleHeadline(
           "Haha, got you imprisoned.<br>Maybe if you <u>try hard</u>,<br> I will let you out of your cell."
         ),
-        new GameElements.Buttons.PrisonButton(),
+        new GameElements.Buttons.EndGameButton(
+          "Get me out of this prison",
+          "Congrats. For a second there I thought you wouldn't make it :)"
+        ),
         new GameElements.Areas.Prison(),
       ]);
       this._state.customStates["clicks"] = 0;
-      window.onclick = () => this.onClick();
     }
 
     updateMousePos(event: MouseEvent): void {
@@ -103,10 +146,8 @@ namespace GameModes {
       let clickCount = this._state.customStates["clicks"];
 
       if (clickCount >= 100) {
-        window.onclick = null;
-        document.getElementById("prison")!.remove();
+        document.getElementById("prison")?.remove();
         this.updateMousePos = super.updateMousePos;
-        this._state.canWin = true;
       }
       if (clickCount >= 10) {
         document.getElementById(
@@ -114,23 +155,102 @@ namespace GameModes {
         )!.innerHTML = `Ok. I get it after ${clickCount} clicks.<br> Here's the deal:<br> Just click 100 times ;)`;
       }
     }
+
+    setupEvents(): void {
+      super.setupEvents();
+      document
+        .getElementById("prison")
+        ?.addEventListener("click", () => this.onClick());
+    }
+
+    canWin(): boolean {
+      return this._state.customStates["clicks"] >= 100;
+    }
   }
 
   @listGameMode("SlowGame", 3)
   export class SlowGame extends GameMode implements IGameMode {
-    private speedRatio: number = 0.09;
+    private speedRatio: number = 0.007;
     constructor() {
       super([
         new GameElements.Headlines.SimpleHeadline("Patience is a virtue"),
-        new GameElements.Buttons.SlowGameButton(),
+        new GameElements.Buttons.EndGameButton(
+          "No",
+          "Yes, it is. Anyway, Congrats and happy to see you here :)"
+        ),
       ]);
-      this._state = new GameState(this.elements, simpleDiv, "normal.png", true);
-      window.onmouseover = () => gameManager.mouseOut();
-      window.onmouseout = () => gameManager.mouseIn();
+      this._state = new GameState(this.elements);
+      this._state.cursorPos = randomCornerLocation();
     }
     updateMousePos(event: MouseEvent): void {
-      this._state.cursorPos.x += event.movementX * this.speedRatio;
-      this._state.cursorPos.y += event.movementY * this.speedRatio;
+      super.updateMousePos(event, this.speedRatio, this.speedRatio);
+    }
+    canWin(): boolean {
+      let res = super.canWin();
+      if (res) {
+        this.speedRatio = 1;
+      }
+      return res;
+    }
+  }
+  @listGameMode("DrunkGame", 3)
+  export class DrunkGame extends GameMode implements IGameMode {
+    private minRatio: number = -0.6;
+    private maxRatio: number = 0.66;
+    constructor() {
+      super([
+        new GameElements.Headlines.SimpleHeadline(
+          "You shouldn't have drunk this much"
+        ),
+        new GameElements.Buttons.EndGameButton(
+          "Get sober",
+          "Congrats. I guess you're not that drunk after all :)"
+        ),
+      ]);
+      this._state = new GameState(this.elements);
+      this._state.cursorPos = randomCornerLocation();
+    }
+    updateMousePos(event: MouseEvent): void {
+      super.updateMousePos(
+        event,
+        randomNumber(this.minRatio, this.maxRatio),
+        randomNumber(this.minRatio, this.maxRatio)
+      );
+    }
+    canWin(): boolean {
+      let res = super.canWin();
+      if (res) {
+        this.maxRatio = this.minRatio = 1;
+      }
+      return res;
+    }
+  }
+  @listGameMode("FastGame", 3)
+  export class FastGame extends GameMode implements IGameMode {
+    private xRatio: number = -140;
+    private yRatio: number = -70;
+    constructor() {
+      super([
+        new GameElements.Headlines.SimpleHeadline(
+          "Slow and steady<br>wins the race"
+        ),
+        new GameElements.Buttons.EndGameButton(
+          "Speeeeeed",
+          "Oh, here you are.\nCouldn't see you while you were moving that fast."
+        ),
+      ]);
+      this._state = new GameState(this.elements);
+      this._state.cursorPos = randomCornerLocation();
+    }
+    updateMousePos(event: MouseEvent): void {
+      super.updateMousePos(event, this.xRatio, this.yRatio);
+    }
+    canWin(): boolean {
+      let res = super.canWin();
+      if (res) {
+        this.xRatio = this.yRatio = 1;
+      }
+      return res;
     }
   }
 }

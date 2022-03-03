@@ -14,8 +14,15 @@ body {
   background-color: var(--color3);
   overflow: hidden;
 }
-* {
-  cursor: none;
+
+button {
+  padding: 2.4vh;
+  margin: 1vh;
+  font-size: 2vh;
+  border-radius: 13px;
+  border: 2px solid var(--color2);
+  background-color: var(--color1);
+  color: var(--color3);
 }
 
 #cursor {
@@ -31,14 +38,57 @@ body {
   right: 50%;
 }
 
-button {
-  padding: 2.4vh;
-  margin: 1vh;
-  font-size: 2vh;
-  border-radius: 13px;
-  border: 2px solid var(--color2);
+#win-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 7%;
+  border-radius: 2vh;
   background-color: var(--color1);
   color: var(--color3);
+}
+
+#stats-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 100px;
+}
+
+#stats {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30vw;
+  height: 60vh;
+  padding: 3vh;
+  border-radius: 2vh;
+  background-color: var(--color1);
+  color: var(--color3);
+  overflow: scroll;
+}
+
+#stats::-webkit-scrollbar {
+  display: none;
+}
+
+#stats table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#stats table tr {
+  border-bottom: 1px solid var(--color2);
+}
+
+#stats table tr th {
+  padding: 0.5vh;
+}
+#stats table tr td {
+  padding: 1vh;
+  text-align: center;
 }
 
 #mouse-alert {
