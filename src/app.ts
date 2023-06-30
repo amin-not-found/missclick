@@ -1,4 +1,4 @@
-var gameManager: GameManager;
+let gameManager: GameManager;
 
 window.onload = function () {
   gameManager = new GameManager();

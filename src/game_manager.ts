@@ -12,21 +12,20 @@ class GameManager {
   setupGame(gameMode: GameModes.GameModeRepresentor) {
     this.gameName = gameMode.name;
     this.game = new gameMode.classConstructor();
-    this.game.setupEvents();
     this.renderGame();
+    this.game.setupEvents();
   }
 
   renderGame() {
     document.getElementById("game")?.remove();
     document.body.prepend(this.game!.state.render());
-    document.body.requestPointerLock();
     window.onclick = (event) => this.onClick(event);
   }
 
   private createNewGame(): GameModes.GameModeRepresentor {
     if (!this.game) {
       return GameModes.availableModes.find(
-        (gameMode) => gameMode.name === "StupidGame"
+        (gameMode) => gameMode.name === "DumbGame"
       )!;
     } else if (!this.game.canWin()) {
       // TODO : change to CheatGame
@@ -48,14 +47,14 @@ class GameManager {
   }
 
   changeGameMode(gameMessage: string) {
-    let gameCountStr = localStorage.getItem(this.gameName!) ?? "0";
-    let gameCount = parseInt(gameCountStr);
-    gameCount = gameCount == NaN ? 0 : gameCount;
+    let gameCount = parseInt(localStorage.getItem(this.gameName!) ?? "0");
+    gameCount = Number.isNaN(gameCount) ? 0 : gameCount;
     localStorage.setItem(this.gameName!, (gameCount + 1).toString());
+
+    this.game?.cleanup();
 
     let newGame = this.createNewGame();
     if (newGame == null) return;
-    document.getElementById("game")?.remove();
 
     var winDialog = new GameElements.ElementCreator("div")
       .setId("win-dialog")
@@ -80,7 +79,6 @@ class GameManager {
   handlePointerLockChange() {
     if (document.pointerLockElement) {
       document.getElementById("mouse-alert")!.className = "mousein-alert";
-      this.game!.setupEvents();
     } else {
       window.onmousemove = null;
       document.getElementById("mouse-alert")!.className = "mouseout-alert";

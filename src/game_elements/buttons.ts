@@ -23,11 +23,11 @@ namespace GameElements {
     }
 
     export class RunningButton implements IButton {
-      readonly text: string = "No";
+      constructor(readonly text: string){}
       render(): HTMLElement {
         return new ElementCreator("button")
           .setId("running_btn")
-          .setText("No")
+          .setText(this.text)
           .toElement();
       }
     }

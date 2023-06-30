@@ -8,7 +8,8 @@ class GameState {
     readonly elements: GameElements.IGameElement[],
     readonly buildRootElement: (state: GameState) => Element = simpleDiv,
     readonly cursor: String = "normal.png",
-    public customStates: Record<string, any> = {}
+    public customStates: Record<string, any> = {},
+    readonly rootElementID: string = "game"
   ) {
     this.cursorPos = new Vector(0, 0);
   }
@@ -17,7 +18,7 @@ class GameState {
     for (const element of this.elements) {
       rootElement.appendChild(element.render());
     }
-    rootElement.id = "game";
+    rootElement.id = this.rootElementID;
     return rootElement;
   }
 }
