@@ -19,16 +19,16 @@ class GameManager {
   renderGame() {
     document.getElementById("game")?.remove();
     document.body.prepend(this.game!.state.render());
-    window.onclick = (event) => this.onClick(event);
   }
 
   private createNewGame(): GameModes.GameModeRepresentor {
     if (!this.game) {
       return GameModes.availableModes.find(
-        (gameMode) => gameMode.name === "DumbGame"
+        (gameMode) => gameMode.name === "DarkGame"
       )!;
     } else if (!this.game.canWin()) {
       // TODO : change to CheatGame
+      console.log("You cheater");
       return GameModes.availableModes.find(
         (gameMode) => gameMode.name === "SlowGame"
       )!;
@@ -56,6 +56,8 @@ class GameManager {
     let newGame = this.createNewGame();
     if (newGame == null) return;
 
+    document.getElementById(this.game!.state.rootElementID)?.remove();
+
     var winDialog = new GameElements.ElementCreator("div")
       .setId("win-dialog")
       .toElement();
@@ -80,7 +82,6 @@ class GameManager {
     if (document.pointerLockElement) {
       document.getElementById("mouse-alert")!.className = "mousein-alert";
     } else {
-      window.onmousemove = null;
       document.getElementById("mouse-alert")!.className = "mouseout-alert";
     }
   }

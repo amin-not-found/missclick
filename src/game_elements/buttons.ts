@@ -1,35 +1,44 @@
 /// <reference path= "base.ts" />
 namespace GameElements {
   export namespace Buttons {
-    interface IButton extends IGameElement {
-      readonly text: string;
+    export class Button extends GameElement {
+      constructor(readonly text: string, process?: ElementProcessor ){
+        super(process);
+      }
+      create() {
+        return new ElementCreator("button").setText(this.text);
+      }
     }
 
-    export class EndGameButton implements IButton {
+
+    export class EndGameButton extends Button {
       constructor(
-        readonly text: string,
+        text: string,
         readonly message: string = "Congrats. For a second there I thought you wouldn't make it :)"
-      ) {}
-      render(): HTMLElement {
-        return new ElementCreator("button")
-          .setText(this.text)
+      ) {
+        super(text);
+      }
+      create() {
+        return super.create()
           .setId("end-game-button")
-          .onClick(() => this.onClick())
-          .toElement();
+          .onClick(() => this.onClick());
       }
       onClick(): void {
         gameManager.changeGameMode(this.message);
       }
     }
 
-    export class RunningButton implements IButton {
-      constructor(readonly text: string){}
+    export class LostEndGameButton extends EndGameButton {
+      create(): ElementCreator {
+        return super.create().setId("absolute-btn");
+      }
       render(): HTMLElement {
-        return new ElementCreator("button")
-          .setId("running_btn")
-          .setText(this.text)
-          .toElement();
+        let e = this.create().toElement();
+        e.style.top = Math.round(randomNumber(-36, 42)) + "vh";
+        e.style.left = Math.round(randomNumber(-24, 64)) + "vw";
+        return e;
       }
     }
+
   }
 }

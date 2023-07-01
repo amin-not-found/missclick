@@ -1,6 +1,7 @@
 {
 	"name": "missclick",
 	"version": "0.1.0",
+	
 	"scripts": {
 		"dev": "nodemon -V --ext '*' -w src -w assets --exec 'npm run build & serve .'",
 		"build": "tsc"

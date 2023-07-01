@@ -2,11 +2,9 @@
 namespace GameModes {
     @listGameMode("FastGame", 3)
     export class FastGame extends GameMode implements IGameMode {
-      private xRatio: number = -140;
-      private yRatio: number = -70;
-      constructor() {
+      constructor() { 
         super([
-          new GameElements.Headlines.SimpleHeadline(
+          new GameElements.Headlines.Headline(
             "Slow and steady<br>wins the race"
           ),
           new GameElements.Buttons.EndGameButton(
@@ -16,16 +14,17 @@ namespace GameModes {
         ]);
         this._state = new GameState(this.elements);
         this._state.cursorPos = randomCornerLocation();
+
       }
       updateMousePos(event: MouseEvent): void {
-        super.updateMousePos(event, this.xRatio, this.yRatio);
+        let btn = document.getElementById("end-game-button")!;
+        let xRatio = btn.clientWidth -1;
+        let yRatio = btn.clientHeight -1;
+        super.updateMousePos(event, xRatio/10, yRatio/10);
       }
-      canWin(): boolean {
-        let res = super.canWin();
-        if (res) {
-          this.xRatio = this.yRatio = 1;
-        }
-        return res;
+      cleanup(): void {
+        super.cleanup();
+        this.updateMousePos = super.updateMousePos;
       }
     }
 }

@@ -4,7 +4,7 @@ namespace GameModes {
     export class PrisonGame extends GameMode implements IGameMode {
       constructor() {
         super([
-          new GameElements.Headlines.SimpleHeadline(
+          new GameElements.Headlines.Headline(
             "Haha, got you imprisoned.<br>Maybe if you <u>try hard</u>,<br> I will let you out of your cell."
           ),
           new GameElements.Buttons.EndGameButton(

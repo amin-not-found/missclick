@@ -27,11 +27,11 @@ namespace GameModes {
 
     export class GameMode implements IGameMode {
         protected _state: GameState;
-        elements: GameElements.IGameElement[];
+        elements: GameElements.GameElement[];
         onclick: (e: MouseEvent) => void;
         onmousemove: (e: MouseEvent) => void;
 
-        constructor(gameElements: GameElements.IGameElement[]) {
+        constructor(gameElements: GameElements.GameElement[]) {
             this.elements = gameElements;
             this._state = new GameState(gameElements);
             this.onclick = (e: MouseEvent) => gameManager.onClick(e);
@@ -87,9 +87,7 @@ namespace GameModes {
             }
             return false;
         }
-        
-        cleanup(): void {
-            document.getElementById(this._state.rootElementID)?.remove();
-        }
+
+        cleanup(): void { }
     }
 }

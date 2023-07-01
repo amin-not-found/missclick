@@ -6,7 +6,7 @@ namespace GameModes {
       private maxRatio: number = 0.66;
       constructor() {
         super([
-          new GameElements.Headlines.SimpleHeadline(
+          new GameElements.Headlines.Headline(
             "You shouldn't have drunk this much"
           ),
           new GameElements.Buttons.EndGameButton(

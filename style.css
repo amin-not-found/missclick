@@ -136,7 +136,7 @@ button {
   }
 }
 
-#running_btn {
+#absolute-btn {
   position: absolute;
 }
 
@@ -147,4 +147,11 @@ button {
   height: 24vh;
   border: 2px dashed var(--color5);
   border-radius: 100%;
+}
+
+.lantern-cursor{
+  border-radius: 100%;
+  padding: 36px 40px;
+  background-color: rgba(256,256,200, 0.2);
+  box-shadow: inset 0px 0px 25px 5px #3e3e00, 0px 0px 72px 40px #444400, 0px 0px 0px 99999px black;
 }
